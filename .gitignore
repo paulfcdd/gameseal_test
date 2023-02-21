@@ -1,3 +1,4 @@
 app/var
 app/vendor
 .idea
+app/install.lock
