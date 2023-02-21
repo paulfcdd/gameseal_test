@@ -17,7 +17,7 @@ class CurrencyApiClient extends AbstractClient
     public function __construct(
         SystemConfigService $configService,
         SerializerInterface $serializer,
-        Client $client, protected
+        Client $client,
         CurrencyExchangeRepository $currencyExchangeRepository,
     )
     {
