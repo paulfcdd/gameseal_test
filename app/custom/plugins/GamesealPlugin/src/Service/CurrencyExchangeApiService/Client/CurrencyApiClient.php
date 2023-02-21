@@ -4,12 +4,9 @@ declare(strict_types=1);
 
 namespace GamesealPlugin\Service\CurrencyExchangeApiService\Client;
 
-use GamesealPlugin\Core\Content\CurrencyExchange\CurrencyExchangeSource;
 use GamesealPlugin\Repository\CurrencyExchange\CurrencyExchangeRepository;
-use GamesealPlugin\Service\CurrencyExchangeApiService\DTO\DtoInterface;
-use GamesealPlugin\Service\CurrencyExchangeApiService\DTO\CurrencyApiClientDto;
+use GamesealPlugin\Service\CurrencyExchangeApiService\DTO\CurrencyApiClientDTO;
 use GuzzleHttp\Client;
-use Shopware\Core\Framework\Context;
 use Shopware\Core\System\SystemConfig\SystemConfigService;
 use Symfony\Component\Serializer\SerializerInterface;
 
@@ -27,34 +24,19 @@ class CurrencyApiClient extends AbstractClient
         parent::__construct($configService, $serializer, $client, $currencyExchangeRepository);
     }
 
-    public function run(): bool
+    public function run(): void
     {
-        try {
-            $url = sprintf('%s/%s?base_currency=%s&currencies=%s', self::API_URL, 'latest', 'PLN', 'EUR,USD');
-            $response = $this->makeRequest('GET', $url);
-            $data = $response->getBody()->getContents();
-            $body = json_decode($data, true);
+        $url = sprintf('%s/%s?base_currency=%s&currencies=%s', self::API_URL, 'latest', 'PLN', 'EUR,USD');
+        $response = $this->makeRequest('GET', $url);
+        $data = $response->getBody()->getContents();
+        $body = json_decode($data, true);
+        $dataArray['lastUpdatedAt'] = $body['meta']['last_updated_at'];
 
-            foreach ($body['data'] as $currency) {
-                $currencyApiDto = new CurrencyApiClientDto();
-                $currencyApiDto->lastUpdatedAt = $body['meta']['last_updated_at'];
-                $currencyApiDto->code = $currency['code'];
-                $currencyApiDto->value = (string)$currency['value'];
-                $dtoToArray = json_decode($this->serializer->serialize($currencyApiDto, 'json'), true);
-                $this->writeData($dtoToArray, $this->createContext($currencyApiDto));
-            }
-
-            return true;
-        } catch (\Exception $exception) {
-            throw $exception;
+        foreach ($body['data'] as $currency) {
+            $currency = array_merge($currency, $dataArray);
+            /** @var CurrencyApiClientDTO $dto */
+            $dto = $this->serializer->deserialize(json_encode($currency), CurrencyApiClientDTO::class, 'json');
+            $this->writeData($dto);
         }
-
-    }
-
-    public function createContext(DtoInterface $dto): Context
-    {
-        $this->context = new Context(new CurrencyExchangeSource($dto->code, $dto->value, $dto->lastUpdatedAt));
-
-        return $this->context;
     }
 }

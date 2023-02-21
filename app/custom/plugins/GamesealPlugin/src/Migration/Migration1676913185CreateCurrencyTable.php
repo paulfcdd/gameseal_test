@@ -19,7 +19,7 @@ class Migration1676913185CreateCurrencyTable extends MigrationStep
                 (
                     `id`          BINARY(16)  NOT NULL,
                     `code`        VARCHAR(255) COLLATE utf8mb4_unicode_ci,
-                    `value` VARCHAR(255) COLLATE utf8mb4_unicode_ci,
+                    `value`       FLOAT COLLATE utf8mb4_unicode_ci,
                     `created_at`  DATETIME(3)NOT NULL,
                     `updated_at`  DATETIME(3)NULL,
                     `last_updated_at`  DATETIME(3)NOT NULL,

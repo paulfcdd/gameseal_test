@@ -10,11 +10,11 @@ class CurrencyExchangeSource implements ContextSource
 {
     private ?string $id;
     private string $code;
-    private string $value;
+    private float $value;
     private string $lastUpdatedAt;
 
 
-    public function __construct(string $code, string $value, string $lastUpdatedAt, ?string $id = null)
+    public function __construct(string $code, float $value, string $lastUpdatedAt, ?string $id = null)
     {
         $this->code = $code;
         $this->value = $value;
@@ -32,7 +32,7 @@ class CurrencyExchangeSource implements ContextSource
         return $this->code;
     }
 
-    public function getValue(): string
+    public function getValue(): float
     {
         return $this->value;
     }

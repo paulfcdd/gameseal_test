@@ -4,9 +4,10 @@ declare(strict_types=1);
 
 namespace GamesealPlugin\Service\CurrencyExchangeApiService\DTO;
 
-class CurrencyApiClientDto implements DtoInterface
+class CurrencyApiClientDTO implements DTOInterface
 {
     public string $code;
-    public string $value;
+    public float $value;
     public string $lastUpdatedAt;
+    public ?string $id;
 }

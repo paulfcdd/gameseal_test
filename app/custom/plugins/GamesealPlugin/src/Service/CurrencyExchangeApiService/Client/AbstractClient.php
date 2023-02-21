@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace GamesealPlugin\Service\CurrencyExchangeApiService\Client;
 
 use GamesealPlugin\Core\Content\CurrencyExchange\CurrencyExchangeSource;
-use GamesealPlugin\Service\CurrencyExchangeApiService\DTO\DtoInterface;
+use GamesealPlugin\Service\CurrencyExchangeApiService\DTO\DTOInterface;
 use GuzzleHttp\Exception\GuzzleException;
 use Psr\Http\Message\ResponseInterface;
 use Shopware\Core\Framework\Context;
@@ -40,8 +40,13 @@ abstract class AbstractClient
         $this->serializer = new Serializer($normalizers, $encoders);
     }
 
-    abstract public function run(): bool;
-    abstract public function createContext(DtoInterface $dto): Context;
+    abstract public function run(): void;
+    public function createContext(DTOInterface $dto): Context
+    {
+        $this->context = new Context(new CurrencyExchangeSource($dto->code, $dto->value, $dto->lastUpdatedAt));
+
+        return $this->context;
+    }
 
     /**
      * @throws GuzzleException
@@ -51,16 +56,22 @@ abstract class AbstractClient
         return $this->client->send(new Request($method, $url, ['apiKey' => $this->apiKey]));
     }
 
-    protected function writeData(array $data, Context $context): void
+    protected function writeData(DTOInterface $dto): void
     {
+        $context = $this->createContext($dto);
         $currencyId = $this->findCurrencyIdByCode($context);
 
         if (!$currencyId) {
-            $this->entityRepository->create([$data], $context);
+            $this->entityRepository->create([$this->dtoToArray($dto)], $context);
         } else {
-            $data['id'] = $currencyId;
-            $this->entityRepository->update([$data], $context);
+            $dto->id = $currencyId;
+            $this->entityRepository->update([$this->dtoToArray($dto)], $context);
         }
+    }
+
+    private function dtoToArray(DTOInterface $dto): array
+    {
+        return json_decode($this->serializer->serialize($dto, 'json'), true);
     }
 
     private function findCurrencyIdByCode(Context $context): ?string

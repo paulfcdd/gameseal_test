@@ -31,10 +31,4 @@ class CurrencyExchangeRepository extends EntityRepository
     {
         parent::__construct($definition, $reader, $versionManager, $searcher, $aggregator, $eventDispatcher, $eventFactory);
     }
-
-    public function update(array $data, Context $context): EntityWrittenContainerEvent
-    {
-        dd($data, $context);
-        return parent::update($data, $context);
-    }
 }

@@ -12,7 +12,7 @@ class CurrencyExchangeEntity extends Entity
     use EntityIdTrait;
 
     protected string $code;
-    protected string $value;
+    protected float $value;
     protected ?\DateTimeInterface $lastUpdatedAt;
 
     public function getCode(): string
@@ -26,15 +26,12 @@ class CurrencyExchangeEntity extends Entity
         return $this;
     }
 
-    /**
-     * @return string
-     */
-    public function getValue(): string
+    public function getValue(): float
     {
         return $this->value;
     }
 
-    public function setValue(string $value): CurrencyExchangeEntity
+    public function setValue(float $value): CurrencyExchangeEntity
     {
         $this->value = $value;
         return $this;

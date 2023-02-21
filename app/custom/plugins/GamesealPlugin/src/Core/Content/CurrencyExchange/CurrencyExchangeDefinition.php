@@ -9,6 +9,7 @@ use Shopware\Core\Framework\DataAbstractionLayer\Field\CreatedAtField;
 use Shopware\Core\Framework\DataAbstractionLayer\Field\DateTimeField;
 use Shopware\Core\Framework\DataAbstractionLayer\Field\Flag\PrimaryKey;
 use Shopware\Core\Framework\DataAbstractionLayer\Field\Flag\Required;
+use Shopware\Core\Framework\DataAbstractionLayer\Field\FloatField;
 use Shopware\Core\Framework\DataAbstractionLayer\Field\IdField;
 use Shopware\Core\Framework\DataAbstractionLayer\Field\StringField;
 use Shopware\Core\Framework\DataAbstractionLayer\Field\UpdatedAtField;
@@ -28,7 +29,7 @@ class CurrencyExchangeDefinition extends EntityDefinition
         return new FieldCollection([
             (new IdField('id', 'id'))->addFlags(new Required(), new PrimaryKey()),
             (new StringField('code', 'code'))->addFlags(new Required()),
-            (new StringField('value', 'value'))->addFlags(new Required()),
+            (new FloatField('value', 'value'))->addFlags(new Required()),
             (new DateTimeField('last_updated_at', 'lastUpdatedAt')),
         ]);
     }
