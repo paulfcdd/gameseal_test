@@ -2,6 +2,7 @@ FROM php:8.1-apache
 
 RUN apt-get update && apt-get install -y --no-install-recommends \
     zlib1g-dev \
+    nano \
     libpng-dev \
     libxslt-dev \
     libpq-dev \
@@ -28,8 +29,12 @@ RUN docker-php-ext-enable xdebug
 
 RUN docker-php-ext-install mysqli pdo_mysql pcntl bcmath soap intl exif gmp xsl sockets gd zip
 
+ADD ./php.ini /usr/local/etc/php/php.ini
+
 RUN echo "memory_limit=512M" >> /usr/local/etc/php/php.ini
 RUN echo "opcache.memory_consumption=256M" >> /usr/local/etc/php/php.ini
+RUN echo 'xdebug.mode=debug' >> /usr/local/etc/php/php.ini
+RUN echo 'xdebug.discover_client_host=true' >> /usr/local/etc/php/php.ini
 
 COPY /vhosts/default-vhost.conf /etc/apache2/sites-available/
 RUN a2dissite 000-default.conf

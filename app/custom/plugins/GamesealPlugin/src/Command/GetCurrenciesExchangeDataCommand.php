@@ -4,8 +4,9 @@ declare(strict_types=1);
 
 namespace GamesealPlugin\Command;
 
-use GamesealPlugin\Service\CurrencyApi\Client\AbstractClient;
-use GamesealPlugin\Service\CurrencyApi\Client\CurrencyApiClient;
+use GamesealPlugin\Exception\CurrencyExchangeServiceException\ApiProviderNotDefinedException;
+use GamesealPlugin\Service\CurrencyExchangeApiService\Client\AbstractClient;
+use Shopware\Core\System\SystemConfig\Exception\ConfigurationNotFoundException;
 use Shopware\Core\System\SystemConfig\SystemConfigService;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
@@ -27,10 +28,25 @@ class GetCurrenciesExchangeDataCommand extends Command
     public function execute(InputInterface $input, OutputInterface $output)
     {
         $apiProvider = $this->configService->get('GamesealPlugin.config.apiProvider');
-        /** @var CurrencyApiClient $service */
-        $service = $this->container->get($apiProvider);
-        dump($service->getLatestRates());
-        $output->writeln('It\'s alive!');
+
+        if (!$apiProvider) {
+            $exception = new ApiProviderNotDefinedException('apiProvider value not found in plugin config');
+            $output->writeln($exception->getMessage());
+
+            return 1;
+        }
+
+        try {
+            /** @var AbstractClient $service */
+            $service = $this->container->get($apiProvider);
+        } catch (\Exception $exception) {
+            $output->writeln($exception->getMessage());
+            return 1;
+        }
+
+        $service->run();
+        $output->writeln('Data imported successfully');
+
         return 0;
     }
 }

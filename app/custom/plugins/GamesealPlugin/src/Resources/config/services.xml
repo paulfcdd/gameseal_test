@@ -6,13 +6,28 @@
 
     <services>
 
+        <prototype namespace="GamesealPlugin\"
+                   resource="../../{Command,Communication,Config,Data,Export,Resources,Repository, Storefront,Subscriber,Upload,Service,DataAbstractionLayer}"
+        />
+
         <service id="Symfony\Component\Serializer\Serializer" />
         <service id="GuzzleHttp\Client" />
+        <service id="gameseal.currency_exchange_api_repository"
+                 class="GamesealPlugin\Repository\CurrencyExchange\CurrencyExchangeRepository"
+                 public="true"
+                 autowire="true"
+        >
+        </service>
 
-        <service id="currencyapi" class="GamesealPlugin\Service\CurrencyApi\Client\CurrencyApiClient" public="true">
+        <service id="currencyapi" class="GamesealPlugin\Service\CurrencyExchangeApiService\Client\CurrencyApiClient" public="true">
             <argument type="service" id="Shopware\Core\System\SystemConfig\SystemConfigService" />
             <argument type="service" id="Symfony\Component\Serializer\Serializer" />
             <argument type="service" id="GuzzleHttp\Client" />
+            <argument type="service" id="gameseal.currency_exchange_api_repository" />
+        </service>
+
+        <service id="GamesealPlugin\Core\Content\CurrencyExchange\CurrencyExchangeDefinition">
+            <tag name="shopware.entity.definition" entity="gameseal_currency_exchange" />
         </service>
 
         <service id="GamesealPlugin\Command\GetCurrenciesExchangeDataCommand">
